@@ -1,0 +1,31 @@
+CC = gcc
+LD = ld
+
+CFLAGS = -Wall -std=c99
+LDFLAGS=
+
+aes_test_sources = example.c aes_output.c sbox.c
+aes_test_objects = $(aes_test_sources:.c=.o)
+cbc_test_sources  = aes_output.c cbc_test.c aes_cbc.c
+cbc_test_objects = $(cbc_test_sources:.c=.o)
+cbc_file_test_sources = aes.c cbc.c aes_cbc.c
+cbc_file_test_objects = $(cbc_file_test_sources:.c=.o)
+
+all: aes_test cbc_test crypto
+
+include $(sources:.c=.d)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+aes_test: $(aes_test_objects)
+	$(CC) $(CFLAGS) $(LDFLAGS)  $(filter %.o %.c,$^)  -o $@
+
+cbc_test: $(cbc_test_objects)
+	$(CC) $(CFLAGS) $(LDFLAGS)  $(filter %.o %.c,$^)  -o $@
+
+crypto: $(cbc_file_test_objects)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(filter %.o %.c,$^) -o $@
+
+
+
